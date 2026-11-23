@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   artworkPrefab: {fileID: 919132149155446097, guid: 8ba270e4c078a6b47b33a387bc696472, type: 3}
-  ProjectilePrefab: {fileID: 0}
+  ProjectilePrefab: {fileID: 4298635474640322057, guid: cc8415c574b0f5844a381f111950a5c4, type: 3}
   muzzleEffect: {fileID: 0}
   firingSound: {fileID: 0}
   chamberSound: {fileID: 0}

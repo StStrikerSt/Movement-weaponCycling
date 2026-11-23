@@ -36,7 +36,7 @@ public class GunPickUp : MonoBehaviour
     {
         if (equippedGun == null)
             return;
-
+        Debug.Log("Attack Received");
         equippedGun.Fire();
     }
 
@@ -46,51 +46,27 @@ public class GunPickUp : MonoBehaviour
 
         if (nearbyGun == null)
             return;
+    }
 
-        if (equippedGun == null)
-        {
-            
-        }
+    private void OnTriggerExit(Collider other)
+    {
+        nearbyGun = null;
     }
 
     public void CollectGun(Gun gun)
     {
-        if (gun == null || gunSlot == null)
-            return;
-
-        if (equippedGun != null)
-        {
-            DropGun(equippedGun);
-        }
-
+        if (gun == null || gunSlot == null || gun.IsEquipped) return;
+        if (equippedGun != null) DropGun(equippedGun);
+        gun.AttachToHolder(gunSlot, gameObject);
         equippedGun = gun;
-        equippedGun.AttachToPlayer(gunSlot);
     }
-
     public void DropGun(Gun gun)
     {
-        if (gun == null)
-            return;
-
-        gun.transform.SetParent(null);
-
-        Rigidbody rb = gun.GetComponent<Rigidbody>();
-
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-            rb.useGravity = true;
-
-            rb.AddForce(transform.forward * 2f, ForceMode.Impulse);
-        }
-
+        if (gun == null || gun != equippedGun) return;
+        gun.DetachFromHolder(transform.forward * 2f);
         equippedGun = null;
-
-        // Destroy dropped gun after 5 seconds
-        Destroy(gun.gameObject, 2f);
-
-        Debug.Log("Gun successfully dropped!");
     }
+
 
     public void OnInteract(InputValue value)
     {

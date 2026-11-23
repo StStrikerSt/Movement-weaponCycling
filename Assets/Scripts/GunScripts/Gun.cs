@@ -24,135 +24,121 @@ public class Gun : MonoBehaviour
     [SerializeField] private AudioClip chamberSound;
     [SerializeField] private ParticleSystem muzzleEffectPrefab;
     [SerializeField] private GameObject projectilePrefab;
+    private GameObject holder;
+    public bool IsEquipped => isEquipped;
+
 
 
     private bool isEquipped;
     private float nextFireTime;
     private bool isOutOfAmmo;
 
-    private void Awake()
+    private void HandleFiring(Vector3 position, Quaternion rotation)
     {
-        //audioSource = transform.parent.GetComponent<AudioSource>();
-
-    }
-
-    private void Update()
-    {
-        if (!isEquipped)
-            return;
-    }
-
-
-    private void HandleFiring()
-    {
-
-        if (Defination == null)
-            return;
-
-        if (firingPoint == null)
-            return;
-
-        if (projectilePrefab == null)
-            return;
-        Debug.Log("Gun IS SHOOTING");
-        if (ammo <= 0)
-            return;
-
-        if (Time.time < nextFireTime)
-            return;
-
+        if (Defination == null || projectilePrefab == null ||
+            ammo <= 0 || fireRate <= 0 || projectileCount <= 0 ||
+            Time.time < nextFireTime) return;
         nextFireTime = Time.time + (1f / fireRate);
         ammo--;
-        if (ammo <= 0 && !isOutOfAmmo)
-        {
-            isOutOfAmmo = true;
-
-        }
-
+        isOutOfAmmo = ammo <= 0;
         for (int i = 0; i < projectileCount; i++)
         {
-            Quaternion spreadRotation = GetSpreadRotation();
-            GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, spreadRotation);
-
+            Quaternion spreadRotation = GetSpreadRotation(rotation);
+            GameObject projectile = Instantiate(projectilePrefab,
+                position, spreadRotation);
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-
             if (projectileRb != null)
-            {
-                projectileRb.AddForce(projectile.transform.forward * projectileForce, ForceMode.Impulse);
-            }
+                projectileRb.AddForce(projectile.transform.forward *
+                    projectileForce, ForceMode.Impulse);
         }
-
         if (muzzleEffectPrefab != null)
         {
-            ParticleSystem muzzleInstance = Instantiate(
-                muzzleEffectPrefab,
-                firingPoint.position,
-                firingPoint.rotation,
-                firingPoint
-            );
-
-            muzzleInstance.Play();
-            Destroy(muzzleInstance.gameObject, 2f);
+            ParticleSystem effect = Instantiate(muzzleEffectPrefab,
+                position, rotation);
+            effect.Play();
+            Destroy(effect.gameObject, 2f);
         }
-
         if (audioSource != null && firingSound != null)
-        {
             audioSource.PlayOneShot(firingSound);
-        }
     }
 
-    private Quaternion GetSpreadRotation()
-    {
-        Vector3 baseDirection = firingPoint.forward;
 
+    private Quaternion GetSpreadRotation(Quaternion rotation)
+    {
         float yaw = Random.Range(-projectileSpread, projectileSpread);
         float pitch = Random.Range(-projectileSpread, projectileSpread);
-
-        Quaternion spreadRotation = Quaternion.Euler(pitch, yaw, 0f);
-        Vector3 finalDirection = spreadRotation * baseDirection;
-
-        return Quaternion.LookRotation(finalDirection);
+        return rotation * Quaternion.Euler(pitch, yaw, 0f);
     }
 
-    public void AttachToPlayer(Transform gunSlot)
-    {
-        if (gunSlot == null)
-            return;
 
-        transform.SetParent(gunSlot);
+    public void AttachToHolder(Transform gunSlot, GameObject owner)
+    {
+        if (gunSlot == null || owner == null || isEquipped) return;
+        holder = owner;
+        transform.SetParent(gunSlot, false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
         transform.localScale = Vector3.one;
-
         isEquipped = true;
-
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
+        Rigidbody body = GetComponent<Rigidbody>();
+        if (body != null)
         {
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-
-        if (colliders != null)
-        {
-            foreach (Collider col in colliders)
+            if (!body.isKinematic)
             {
-                col.isTrigger = true;
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
             }
+            body.useGravity = false;
+            body.isKinematic = true;
+        }
+        foreach (Collider col in colliders)
+            if (col != null) col.isTrigger = true;
+    }
+
+    public void DetachFromHolder(Vector3 dropImpulse)
+    {
+        if (!isEquipped) return;
+        transform.SetParent(null, true);
+        isEquipped = false;
+        holder = null;
+        foreach (Collider col in colliders)
+            if (col != null) col.isTrigger = false;
+        Rigidbody body = GetComponent<Rigidbody>();
+        if (body != null)
+        {
+            body.isKinematic = false;
+            body.useGravity = true;
+            body.AddForce(dropImpulse, ForceMode.Impulse);
         }
     }
 
+
     public void InjectDefinition(GunDefination def)
     {
+        if (def == null)
+        {
+            Debug.Log("No def was found - returning");
+            return;
+        }
+
         Defination = def;
+        Debug.Log("def found - " + def);
 
         fireRate = def.fireRate;
+        Debug.Log("fire rate = " + def.fireRate);
         projectileForce = def.projectileForce;
+        Debug.Log("projectileForce = " + def.projectileForce);
         projectileSpread = def.projectileSpread;
+        Debug.Log("projectileSpread = " + def.projectileSpread);
         projectileCount = def.projectileCount;
+        Debug.Log("projectileCount = " + def.projectileCount);
         ammo = def.ammoCount;
+        Debug.Log("ammoCount = " + def.ammoCount);
+        projectilePrefab = def.ProjectilePrefab;
+        Debug.Log("ProjectilePrefab = " + def.ProjectilePrefab);
+        isOutOfAmmo = ammo <= 0;
+        nextFireTime = 0f;
+
 
         firingSound = def.firingSound;
         chamberSound = def.chamberSound;
@@ -196,19 +182,15 @@ public class Gun : MonoBehaviour
 
     public void Fire()
     {
-        if (!isEquipped)
-            return;
-
-        HandleFiring();
+        if (firingPoint == null) return;
+        Fire(firingPoint.position, firingPoint.rotation, projectilePrefab);
     }
-
-    public void Fire(Vector3 FiringPoint, Quaternion rotation, GameObject prefab)
+    public void Fire(Vector3 position, Quaternion rotation, GameObject bulletVisualPrefab)
     {
-        if (!isEquipped)
-            return;
-
-        HandleFiring(FiringPoint, rotation, prefab);
+        if (!isEquipped) return;
+        HandleFiring(position, rotation, projectilePrefab);
     }
+
 
     private void HandleFiring(Vector3 FiringPoint, Quaternion rotation, GameObject prefab)
     {
@@ -238,8 +220,11 @@ public class Gun : MonoBehaviour
 
         for (int i = 0; i < projectileCount; i++)
         {
-            Quaternion spreadRotation = GetSpreadRotation();
+            Quaternion spreadRotation = GetSpreadRotation(rotation);
             GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, spreadRotation);
+            // Immediately after Instantiate(projectilePrefab, ...):
+            Projectiles hit = projectile.GetComponent<Projectiles>();
+            if (hit != null) hit.Initialise(holder);
 
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 

@@ -7,8 +7,11 @@ public class EnemyAI : MonoBehaviour
 
 
     // REFs to gun system
-    [SerializeField] private Gun heldGun;
-    [SerializeField] private GunSpawner spawner;
+    [SerializeField] private Gun gunPrefab;
+    [SerializeField] private GunDefination startingGun;
+    [SerializeField] private Transform gunSlot;
+    [SerializeField] private Transform enemyFiringPoint;
+    private Gun equippedGun;
     public enum State { Patrol, Chase, Attack }
     public State currentState = State.Patrol;
 
@@ -60,7 +63,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
- 
+        EquipStartingGun();
     }
 
     void Start()
@@ -91,6 +94,15 @@ public class EnemyAI : MonoBehaviour
                 break;
         }
 
+    }
+
+    private void EquipStartingGun()
+    {
+        if (equippedGun != null || gunPrefab == null ||
+            startingGun == null || gunSlot == null) return;
+        equippedGun = Instantiate(gunPrefab);
+        equippedGun.InjectDefinition(startingGun);
+        equippedGun.AttachToHolder(gunSlot, gameObject);
     }
 
     // ---------------- PATROL ---------------- //
@@ -176,45 +188,15 @@ public class EnemyAI : MonoBehaviour
     void Shoot()
     {
         //Instead use the public methoid from gun
-
-        heldGun.Fire(firePoint.position, firePoint.rotation, bulletVisualPrefab);
-        GameObject bullet = Instantiate(
-            bulletVisualPrefab,
-            firePoint.position,
-            firePoint.rotation
-        );
-
-        StartCoroutine(MoveBulletVisual(bullet));
-
-        Ray ray = new Ray(firePoint.position, firePoint.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, attackDistance))
+        if (equippedGun != null && enemyFiringPoint != null)
         {
-            if (hit.transform.CompareTag("Player"))
-            {
-                hit.transform.GetComponent<PlayerHealth>()
-                    ?.TakeDamage(damage);
-            }
+            equippedGun.Fire(firePoint.position, firePoint.rotation, bulletVisualPrefab);
         }
     }
 
-    IEnumerator MoveBulletVisual(GameObject bullet)
-    {
-        float timer = 0f;
-
-        while (timer < bulletVisualLifeTime)
-        {
-            bullet.transform.position +=
-                bullet.transform.forward * bulletVisualSpeed * Time.deltaTime;
-
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        Destroy(bullet);
-    }
 
 
-    // ---------------- DETECTION ---------------- //
+       // ---------------- DETECTION ---------------- //
     bool PlayerInChaseRange()
     {
         float dist = Vector3.Distance(transform.position, player.position);

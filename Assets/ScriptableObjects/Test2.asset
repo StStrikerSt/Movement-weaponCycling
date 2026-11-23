@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Test2
   m_EditorClassIdentifier: 
   artworkPrefab: {fileID: 919132149155446097, guid: 56686e014067ca441a5f97ebd4a0e0b5, type: 3}
-  ProjectilePrefab: {fileID: 0}
+  ProjectilePrefab: {fileID: 4298635474640322057, guid: cc8415c574b0f5844a381f111950a5c4, type: 3}
   muzzleEffect: {fileID: 0}
   firingSound: {fileID: 0}
   chamberSound: {fileID: 0}

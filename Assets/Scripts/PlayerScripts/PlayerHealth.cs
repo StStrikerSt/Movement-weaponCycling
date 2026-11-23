@@ -63,4 +63,9 @@ public class PlayerHealth : MonoBehaviour
         MaxShield = Mathf.Clamp(MaxShield, 0, 100);
         ArmourBar.fillAmount = MaxShield / 100f;
     }
+
+    public void OnProjectileHit()
+    {
+        TakeDamage(20);
+    }
 }
