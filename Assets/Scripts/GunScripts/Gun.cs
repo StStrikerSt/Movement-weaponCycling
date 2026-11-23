@@ -20,6 +20,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private float projectileSpread;
     [SerializeField] private int projectileCount;
     [SerializeField] private int ammo;
+    [SerializeField] private float Damage;
     [SerializeField] private AudioClip firingSound;
     [SerializeField] private AudioClip chamberSound;
     [SerializeField] private ParticleSystem muzzleEffectPrefab;
@@ -134,6 +135,8 @@ public class Gun : MonoBehaviour
         Debug.Log("projectileCount = " + def.projectileCount);
         ammo = def.ammoCount;
         Debug.Log("ammoCount = " + def.ammoCount);
+        Damage = def.Damage;
+        Debug.Log("Damage = " + def.Damage);
         projectilePrefab = def.ProjectilePrefab;
         Debug.Log("ProjectilePrefab = " + def.ProjectilePrefab);
         isOutOfAmmo = ammo <= 0;

@@ -18,6 +18,7 @@ MonoBehaviour:
   firingSound: {fileID: 0}
   chamberSound: {fileID: 0}
   fireRate: 5
+  Damage: 2
   projectileForce: 12
   projectileCount: 100
   projectileSpread: 4

@@ -7,7 +7,7 @@ public class PlayerHealth : MonoBehaviour
     public Image ArmourBar;
     public float MaxHealth;
     public float MaxShield;
-    
+    [SerializeField] private GunDefination Defination;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -35,15 +35,16 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float Damage)
+    public void TakeDamage(GunDefination def)
     {
+        Defination = def;
         if(MaxShield <= 0)
         {
-            MaxHealth -= Damage;
+            MaxHealth -= def.Damage;
         }
         else if(MaxShield >= 0)
         {
-            MaxShield -= Damage;
+            MaxShield -= def.Damage;
         }
         
         HealthBar.fillAmount = MaxHealth / 100f;
@@ -66,6 +67,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void OnProjectileHit()
     {
-        TakeDamage(20);
+        
+        TakeDamage(def);
     }
 }

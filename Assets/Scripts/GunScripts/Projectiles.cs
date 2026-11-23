@@ -4,6 +4,7 @@ public class Projectiles : MonoBehaviour
     private GameObject shooter;
     private string shooterTag;
     private bool hasHit;
+    private float projectileDamage;
     private void Awake() { Destroy(gameObject, 5f); }
     private void OnTriggerEnter(Collider other)
     {
@@ -18,8 +19,7 @@ public class Projectiles : MonoBehaviour
         {
             if (target.tag == shooterTag) return;
             hasHit = true;
-            target.SendMessage("OnProjectileHit",
-                SendMessageOptions.RequireReceiver);
+            target.SendMessage("OnProjectileHit", SendMessageOptions.RequireReceiver);
         }
         else
         {

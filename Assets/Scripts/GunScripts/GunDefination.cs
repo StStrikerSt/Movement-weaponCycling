@@ -11,6 +11,7 @@ public class GunDefination : ScriptableObject
     public AudioClip chamberSound;
 
     public float fireRate;
+    public float Damage;
 
     public float projectileForce;
     public int projectileCount;
