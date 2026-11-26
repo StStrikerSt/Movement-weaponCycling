@@ -34,34 +34,34 @@ public class Gun : MonoBehaviour
     private float nextFireTime;
     private bool isOutOfAmmo;
 
-    private void HandleFiring(Vector3 position, Quaternion rotation)
-    {
-        if (Defination == null || projectilePrefab == null ||
-            ammo <= 0 || fireRate <= 0 || projectileCount <= 0 ||
-            Time.time < nextFireTime) return;
-        nextFireTime = Time.time + (1f / fireRate);
-        ammo--;
-        isOutOfAmmo = ammo <= 0;
-        for (int i = 0; i < projectileCount; i++)
-        {
-            Quaternion spreadRotation = GetSpreadRotation(rotation);
-            GameObject projectile = Instantiate(projectilePrefab,
-                position, spreadRotation, Defination);
-            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-            if (projectileRb != null)
-                projectileRb.AddForce(projectile.transform.forward *
-                    projectileForce, ForceMode.Impulse);
-        }
-        if (muzzleEffectPrefab != null)
-        {
-            ParticleSystem effect = Instantiate(muzzleEffectPrefab,
-                position, rotation);
-            effect.Play();
-            Destroy(effect.gameObject, 2f);
-        }
-        if (audioSource != null && firingSound != null)
-            audioSource.PlayOneShot(firingSound);
-    }
+    //private void HandleFiring(Vector3 position, Quaternion rotation)
+    //{
+    //    if (Defination == null || projectilePrefab == null ||
+    //        ammo <= 0 || fireRate <= 0 || projectileCount <= 0 ||
+    //        Time.time < nextFireTime) return;
+    //    nextFireTime = Time.time + (1f / fireRate);
+    //    ammo--;
+    //    isOutOfAmmo = ammo <= 0;
+    //    for (int i = 0; i < projectileCount; i++)
+    //    {
+    //        Quaternion spreadRotation = GetSpreadRotation(rotation);
+    //        GameObject projectile = Instantiate(projectilePrefab,
+    //            position, spreadRotation);
+    //        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+    //        if (projectileRb != null)
+    //            projectileRb.AddForce(projectile.transform.forward *
+    //                projectileForce, ForceMode.Impulse);
+    //    }
+    //    if (muzzleEffectPrefab != null)
+    //    {
+    //        ParticleSystem effect = Instantiate(muzzleEffectPrefab,
+    //            position, rotation);
+    //        effect.Play();
+    //        Destroy(effect.gameObject, 2f);
+    //    }
+    //    if (audioSource != null && firingSound != null)
+    //        audioSource.PlayOneShot(firingSound);
+    //}
 
 
     private Quaternion GetSpreadRotation(Quaternion rotation)
@@ -186,16 +186,16 @@ public class Gun : MonoBehaviour
     public void Fire()
     {
         if (firingPoint == null) return;
-        Fire(firingPoint.position, firingPoint.rotation, projectilePrefab);
+        Fire(firingPoint.position, firingPoint.rotation, projectilePrefab, Defination);
     }
-    public void Fire(Vector3 position, Quaternion rotation, GameObject bulletVisualPrefab)
+    public void Fire(Vector3 position, Quaternion rotation, GameObject bulletVisualPrefab, GunDefination firedFrom)
     {
         if (!isEquipped) return;
-        HandleFiring(position, rotation, projectilePrefab);
+        HandleFiring(position, rotation, projectilePrefab, firedFrom);
     }
 
 
-    private void HandleFiring(Vector3 FiringPoint, Quaternion rotation, GameObject prefab)
+    private void HandleFiring(Vector3 FiringPoint, Quaternion rotation, GameObject prefab, GunDefination firedFrom)
     {
 
         if (Defination == null)
@@ -225,6 +225,15 @@ public class Gun : MonoBehaviour
         {
             Quaternion spreadRotation = GetSpreadRotation(rotation);
             GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, spreadRotation);
+            if(projectile != null)
+            {
+                projectile.GetComponent<Projectiles>().firedFrom = firedFrom;
+                if(firedFrom == null)
+                {
+                    Debug.LogWarning("couldnt find " + firedFrom);
+                }
+                Debug.Log("Which Gun Fired this " + firedFrom);
+            }
             // Immediately after Instantiate(projectilePrefab, ...):
             Projectiles hit = projectile.GetComponent<Projectiles>();
             if (hit != null) hit.Initialise(holder);

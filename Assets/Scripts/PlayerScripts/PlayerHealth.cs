@@ -11,24 +11,24 @@ public class PlayerHealth : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("HealthKit"))
+        if (other.gameObject.CompareTag("HealthKit"))
         {
             Heal(10);
             Destroy(other.gameObject);
         }
-        
-        if(other.gameObject.CompareTag("ArmourKit"))
+
+        if (other.gameObject.CompareTag("ArmourKit"))
         {
             Repair(10);
             Destroy(other.gameObject);
@@ -38,15 +38,15 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(GunDefination def)
     {
         Defination = def;
-        if(MaxShield <= 0)
+        if (MaxShield <= 0)
         {
             MaxHealth -= def.Damage;
         }
-        else if(MaxShield >= 0)
+        else if (MaxShield >= 0)
         {
             MaxShield -= def.Damage;
         }
-        
+
         HealthBar.fillAmount = MaxHealth / 100f;
         ArmourBar.fillAmount = MaxShield / 100f;
     }
@@ -65,8 +65,4 @@ public class PlayerHealth : MonoBehaviour
         ArmourBar.fillAmount = MaxShield / 100f;
     }
 
-    public void OnProjectileHit()
-    {
-       
-    }
 }

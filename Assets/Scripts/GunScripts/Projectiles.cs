@@ -6,7 +6,7 @@ public class Projectiles : MonoBehaviour
     private bool hasHit;
     private float projectileDamage;
     private PlayerHealth health;
-    private GunDefination defination;
+    public GunDefination firedFrom;
     private void Awake() 
     {
         Destroy(gameObject, 5f); 
@@ -24,7 +24,7 @@ public class Projectiles : MonoBehaviour
         {
             if (target.tag == shooterTag) return;
             hasHit = true;
-            target.SendMessage("OnProjectileHit", SendMessageOptions.RequireReceiver);
+            health.TakeDamage(firedFrom.Damage);
         }
         else
         {

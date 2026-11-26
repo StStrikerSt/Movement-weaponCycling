@@ -190,7 +190,7 @@ public class EnemyAI : MonoBehaviour
         //Instead use the public methoid from gun
         if (equippedGun != null && enemyFiringPoint != null)
         {
-            equippedGun.Fire(firePoint.position, firePoint.rotation, bulletVisualPrefab);
+            equippedGun.Fire(firePoint.position, firePoint.rotation, bulletVisualPrefab, startingGun);
         }
     }
 
