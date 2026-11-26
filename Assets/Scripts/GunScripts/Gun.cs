@@ -46,7 +46,7 @@ public class Gun : MonoBehaviour
         {
             Quaternion spreadRotation = GetSpreadRotation(rotation);
             GameObject projectile = Instantiate(projectilePrefab,
-                position, spreadRotation);
+                position, spreadRotation, Defination);
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
             if (projectileRb != null)
                 projectileRb.AddForce(projectile.transform.forward *

@@ -67,7 +67,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void OnProjectileHit()
     {
-        
-        TakeDamage(def);
+       
     }
 }

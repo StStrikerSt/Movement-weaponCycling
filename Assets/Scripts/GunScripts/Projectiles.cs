@@ -5,7 +5,12 @@ public class Projectiles : MonoBehaviour
     private string shooterTag;
     private bool hasHit;
     private float projectileDamage;
-    private void Awake() { Destroy(gameObject, 5f); }
+    private PlayerHealth health;
+    private GunDefination defination;
+    private void Awake() 
+    {
+        Destroy(gameObject, 5f); 
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (hasHit || other.GetComponentInParent<Projectiles>() != null)
@@ -32,6 +37,8 @@ public class Projectiles : MonoBehaviour
     {
         shooter = owner;
         shooterTag = owner != null ? owner.tag : null;
+        owner.GetComponentInChildren<Gun>();
+        Debug.Log("Owners gun" + owner);
     }
 }
 

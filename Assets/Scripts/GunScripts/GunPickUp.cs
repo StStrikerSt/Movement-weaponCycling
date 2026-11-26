@@ -65,6 +65,7 @@ public class GunPickUp : MonoBehaviour
         if (gun == null || gun != equippedGun) return;
         gun.DetachFromHolder(transform.forward * 2f);
         equippedGun = null;
+        Destroy(gun.gameObject, 2f);
     }
 
 
